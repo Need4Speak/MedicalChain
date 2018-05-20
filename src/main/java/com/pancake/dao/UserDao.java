@@ -1,6 +1,6 @@
 package com.pancake.dao;
 
-import com.pancake.entity.User;
+import com.pancake.entity.component.User;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

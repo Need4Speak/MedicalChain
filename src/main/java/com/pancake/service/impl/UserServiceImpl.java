@@ -1,7 +1,7 @@
 package com.pancake.service.impl;
 
 import com.pancake.dao.UserDao;
-import com.pancake.entity.User;
+import com.pancake.entity.component.User;
 import com.pancake.exception.UserException;
 import com.pancake.service.UserService;
 import org.slf4j.Logger;

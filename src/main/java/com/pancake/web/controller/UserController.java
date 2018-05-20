@@ -1,8 +1,6 @@
 package com.pancake.web.controller;
 
-import com.pancake.dao.UserDao;
-import com.pancake.entity.Result;
-import com.pancake.entity.User;
+import com.pancake.entity.util.Result;
 import com.pancake.service.UserService;
 import com.pancake.util.ResultUtil;
 import org.slf4j.Logger;
@@ -12,8 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.List;
 
 /**
  * Created by chao on 2017/6/13.

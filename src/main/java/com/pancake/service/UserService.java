@@ -1,6 +1,6 @@
 package com.pancake.service;
 
-import com.pancake.entity.User;
+import com.pancake.entity.component.User;
 
 import java.util.List;
 

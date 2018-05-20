@@ -1,4 +1,4 @@
-package com.pancake.entity;
+package com.pancake.entity.util;
 
 /**
  * Created by chao on 2017/6/13.

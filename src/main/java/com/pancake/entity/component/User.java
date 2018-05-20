@@ -1,7 +1,5 @@
-package com.pancake.entity;
+package com.pancake.entity.component;
 
-import java.sql.Timestamp;
-import java.util.Date;
 
 /**
  * Created by chao on 2017/6/13.

@@ -1,6 +1,6 @@
 package com.pancake.util;
 
-import com.pancake.entity.Result;
+import com.pancake.entity.util.Result;
 import com.pancake.enums.StatEnum;
 
 /**
