@@ -12,3 +12,9 @@
 4. Sql file is in `src\main\sql\user_demo.sql`.
 5. Using Druid 1.1.0 as data store, and logback 1.1.3 as logger.
 6. Usring JDK 1.8 and Tomcat8.
+
+# Blockchain
+用于开发 validator node.
+1. mongodb 3.2
+2. RabbitMQ 3.7.4
+3. 启动顺序：Transaction Transmitter - Server Front End - Blocker Server
