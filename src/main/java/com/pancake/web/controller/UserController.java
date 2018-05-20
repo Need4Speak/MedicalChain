@@ -1,7 +1,7 @@
 package com.pancake.web.controller;
 
 import com.pancake.entity.util.Result;
-import com.pancake.service.UserService;
+import com.pancake.service.component.UserService;
 import com.pancake.util.ResultUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

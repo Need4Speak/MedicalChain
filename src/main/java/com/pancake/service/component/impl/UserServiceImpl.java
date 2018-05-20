@@ -1,9 +1,9 @@
-package com.pancake.service.impl;
+package com.pancake.service.component.impl;
 
 import com.pancake.dao.UserDao;
 import com.pancake.entity.component.User;
 import com.pancake.exception.UserException;
-import com.pancake.service.UserService;
+import com.pancake.service.component.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

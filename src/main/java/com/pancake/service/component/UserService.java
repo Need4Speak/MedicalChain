@@ -1,4 +1,4 @@
-package com.pancake.service;
+package com.pancake.service.component;
 
 import com.pancake.entity.component.User;
 
