@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pancake.dao.InfectiousDiseaseDao">
+    <select id="queryAll" resultMap="InfectiousDiseaseWithClassification">
+        SELECT ids.id as ids_id, ids.name as ids_name, idsc.id as idsc_id, idsc.name as idsc_name
+        FROM infectious_disease ids, infectious_disease_classification idsc
+        WHERE ids.classification = idsc.id
+    </select>
+
+    <resultMap id="InfectiousDiseaseWithClassification" type="InfectiousDisease">
+        <id column="ids_id" property="id"/>
+        <result column="ids_name" property="name"/>
+        <association property="infectiousDiseaseClassification" javaType="InfectiousDiseaseClassification">
+            <id column="idsc_id" property="id"/>
+            <result column="idsc_name" property="name"/>
+        </association>
+    </resultMap>
+</mapper>
