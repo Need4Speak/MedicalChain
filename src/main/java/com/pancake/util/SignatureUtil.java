@@ -1,5 +1,6 @@
 package com.pancake.util;
 
+import com.pancake.entity.util.Const;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -64,7 +65,7 @@ public class SignatureUtil {
     public static PrivateKey loadPvtKey(String algorithm) {
         PrivateKey privateKey = null;
         try {
-            String pvtKeyStr = readFile("privateKey.txt");
+            String pvtKeyStr = readFile(Const.PvtKeyFile);
 
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
             PKCS8EncodedKeySpec pvtSpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(pvtKeyStr));
@@ -138,7 +139,7 @@ public class SignatureUtil {
     public static String loadPubKeyStr(String algorithm) {
         String pubKeyStr= null;
         try {
-            pubKeyStr = readFile("publicKey.txt");
+            pubKeyStr = readFile(Const.PubKeyFile);
         } catch (Exception e) {
             e.printStackTrace();
         }

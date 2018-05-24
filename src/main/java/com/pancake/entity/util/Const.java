@@ -7,6 +7,9 @@ public class Const {
     public final static String BlockChainNodesFile =
             "src/main/resources/blockchain-nodes.json";
 
+    public final static String PvtKeyFile = "C:\\Users\\chao\\medical_chain\\privateKey.txt";
+    public final static String PubKeyFile = "C:\\Users\\chao\\medical_chain\\publicKey.txt";
+
     public final static String CM = "ClientMsg";
     public final static String PPM = "PrePrepareMsg";
     public final static String PM = "PrepareMsg";

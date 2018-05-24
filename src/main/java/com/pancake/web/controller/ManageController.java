@@ -1,19 +1,13 @@
 package com.pancake.web.controller;
 
-import com.pancake.entity.util.Result;
-import com.pancake.service.component.UserService;
-import com.pancake.service.pojo.CaseClassificationService;
-import com.pancake.service.pojo.InfectiousDiseaseService;
-import com.pancake.service.pojo.PatientBelongService;
-import com.pancake.service.pojo.PatientCareerService;
-import com.pancake.util.ResultUtil;
+import com.pancake.entity.pojo.InfectiousDiseaseReportCard;
+import com.pancake.service.pojo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -33,6 +27,8 @@ public class ManageController {
     private CaseClassificationService caseClassificationService;
     @Autowired
     private InfectiousDiseaseService infectiousDiseaseService;
+    @Autowired
+    private InfectiousDiseaseReportCardService infectiousDiseaseReportCardService;
 
     /**
      * 跳转到添加页面
@@ -53,7 +49,9 @@ public class ManageController {
     }
 
     @RequestMapping(value = "save", method = RequestMethod.POST)
-    public ModelAndView save() {
+    public ModelAndView save(InfectiousDiseaseReportCard card) {
+        logger.info("card info : " + card.toString());
+        infectiousDiseaseReportCardService.saveInBlock(card);
         ModelAndView mav = new ModelAndView("save_success");
         return mav;
     }
