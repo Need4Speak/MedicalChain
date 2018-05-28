@@ -3,6 +3,7 @@ package com.pancake.service.message.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.entity.message.*;
 import com.pancake.entity.util.Const;
+import com.pancake.entity.util.NetAddress;
 import com.pancake.service.component.impl.BlockService;
 import com.pancake.service.component.impl.TransactionService;
 import com.pancake.util.MongoUtil;
@@ -100,7 +101,9 @@ public class MessageService {
      */
     @SuppressWarnings("Duplicates")
     public void traversePPMAndSaveMsg(String ppmCollection, String traverseCollection, String saveCollection,
-                                             String msgType, String ip, int port) {
+                                      String msgType, NetAddress addr) {
+        String ip = addr.getIp();
+        int port = addr.getPort();
         List<String> ppmList = new ArrayList<String>();
         while (true) {
             try {
@@ -138,7 +141,7 @@ public class MessageService {
                                 CommittedMessage cmtdm = cmtdmService.genInstance(ppm.getClientMsg().getMsgId(),
                                         ppm.getViewId(), ppm.getSeqNum(), ip, port);
                                 ClientMessage clientMsg = ppm.getClientMsg();
-                                cmtdmService.procCMTDM(cmtdm, clientMsg, port);
+                                cmtdmService.procCMTDM(cmtdm, clientMsg, addr);
                             }
                         }
                     } else {

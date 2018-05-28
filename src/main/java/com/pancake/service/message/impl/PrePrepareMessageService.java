@@ -5,9 +5,9 @@ import com.pancake.entity.message.ClientMessage;
 import com.pancake.entity.message.PrePrepareMessage;
 import com.pancake.entity.message.PrepareMessage;
 import com.pancake.entity.util.Const;
+import com.pancake.entity.util.NetAddress;
 import com.pancake.service.component.impl.NetService;
 import com.pancake.util.MongoUtil;
-import com.pancake.util.NetUtil;
 import com.pancake.util.SignatureUtil;
 import com.pancake.util.TimeUtil;
 import org.slf4j.Logger;
@@ -28,13 +28,12 @@ public class PrePrepareMessageService {
      * 处理接收到的预准备消息
      *
      * @param rcvMsg
-     * @param localPort
+     * @param validatorAddr
      * @return
      * @throws IOException
      */
-    public static boolean procPPMsg(String rcvMsg, int localPort) throws IOException {
-        String realIp = NetUtil.getRealIp();
-        String url = realIp + ":" + localPort;
+    public static boolean procPPMsg(String rcvMsg, NetAddress validatorAddr) throws IOException {
+        String url = validatorAddr.toString();
         logger.info("本机地址为：" + url);
 
         // 1. 校验接收到的 PrePrepareMessage
@@ -55,11 +54,11 @@ public class PrePrepareMessageService {
 
             // 3. 生成 PrepareMessage，存入集合，并向其他节点进行广播
             PrepareMessage pm = PrepareMessageService.genInstance(ppm.getSignature(), ppm.getViewId(), ppm.getSeqNum(),
-                    NetUtil.getRealIp(), localPort);
+                    validatorAddr.getIp(), validatorAddr.getPort());
             String pmCollection = url + "." + Const.PM;
             PrepareMessageService.save(pm, pmCollection);
             logger.info("PrepareMessage [" + pm.getMsgId() + "] 已存入数据库");
-            NetService.broadcastMsg(NetUtil.getRealIp(), localPort, pm.toString());
+            NetService.broadcastMsg(validatorAddr.getIp(), validatorAddr.getPort(), pm.toString());
         }
         return verifyRes;
     }

@@ -31,8 +31,8 @@ public class ServerFrontEnd {
         logger.info("availableProcessors: " + availableProcessors);
         for (NetAddress va : netAddressList) {
             try {
-                logger.info("开始启动端口为[" + va.getPort() + "]的 Validator");
-                es.execute(new ValidatorServer(va.getPort()));
+                logger.info("开始启动 Validator：" + va.toString());
+                es.execute(new ValidatorServer(va));
             } catch (IOException e) {
                 e.printStackTrace();
             }

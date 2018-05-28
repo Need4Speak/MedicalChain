@@ -6,8 +6,8 @@ import com.pancake.entity.component.Transaction;
 import com.pancake.entity.message.PrePrepareMessage;
 import com.pancake.entity.message.TransactionMessage;
 import com.pancake.entity.util.Const;
+import com.pancake.entity.util.NetAddress;
 import com.pancake.service.component.impl.NetService;
-import com.pancake.service.message.impl.MessageService;
 import com.pancake.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +37,10 @@ public class TransactionMessageService {
     /**
      * 接收到 ClientMessage 为 TransactionMessage 时进行的一系列处理
      * @param rcvMsg
-     * @param localPort
+     * @param validatorAddr
      */
-    public static void procTxMsg(String rcvMsg, int localPort) {
-        String realIp = NetUtil.getRealIp();
-        String url = realIp + ":" + localPort;
+    public static void procTxMsg(String rcvMsg, NetAddress validatorAddr) {
+        String url = validatorAddr.toString();
         TransactionMessage txMsg = null;
         try {
             txMsg = objectMapper.readValue(rcvMsg, TransactionMessage.class);
@@ -68,7 +67,7 @@ public class TransactionMessageService {
 
             // 4. 主节点向其他备份节点广播 PrePrepareMessage
             try {
-                NetService.broadcastMsg(NetUtil.getRealIp(), localPort, objectMapper.writeValueAsString(ppm));
+                NetService.broadcastMsg(validatorAddr.getIp(), validatorAddr.getPort(), objectMapper.writeValueAsString(ppm));
             } catch (IOException e) {
                 e.printStackTrace();
             }

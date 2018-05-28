@@ -1,9 +1,9 @@
 package com.pancake.socket;
 
+import com.pancake.entity.util.NetAddress;
 import com.pancake.handler.CommittedMsgHandler;
-import com.pancake.handler.Handler;
+import com.pancake.handler.ValidatorHandler;
 import com.pancake.handler.PreparedMsgHandler;
-import com.pancake.util.NetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +21,11 @@ public class ValidatorServer implements Runnable {
     private final ServerSocket serverSocket;
     private final ExecutorService threadPool;
     private final ExecutorService pdmhPool;
+    private NetAddress validatorAddr;
 
-    public ValidatorServer(int port) throws IOException {
-        serverSocket = new ServerSocket(port);
+    public ValidatorServer(NetAddress validatorAddr) throws IOException {
+        this.validatorAddr = validatorAddr;
+        serverSocket = new ServerSocket(validatorAddr.getPort());
         threadPool = Executors.newCachedThreadPool();
         pdmhPool = Executors.newCachedThreadPool();
 //        serverSocket.setSoTimeout(100000);
@@ -45,17 +47,18 @@ public class ValidatorServer implements Runnable {
 
     public void run() {
         try {
-            logger.info("服务器 [" + NetUtil.getRealIp() + ":"
+            String ip = validatorAddr.getIp();
+            logger.info("服务器 [" + ip + ":"
                     + serverSocket.getLocalPort() + "] 启动");
-            logger.info("服务器 [" + NetUtil.getRealIp() + ":"
+            logger.info("服务器 [" + ip + ":"
                     + serverSocket.getLocalPort() + "] 启动检测生成 PreparedMessage 服务器");
-            new Thread(new PreparedMsgHandler(NetUtil.getRealIp(), serverSocket.getLocalPort())).start();
-            logger.info("服务器 [" + NetUtil.getRealIp() + ":"
+            new Thread(new PreparedMsgHandler(validatorAddr)).start();
+            logger.info("服务器 [" + ip + ":"
                     + serverSocket.getLocalPort() + "] 启动检测生成 CommittedMessage 服务器");
-            new Thread(new CommittedMsgHandler(NetUtil.getRealIp(), serverSocket.getLocalPort())).start();
+            new Thread(new CommittedMsgHandler(validatorAddr)).start();
 
             while (true) {
-                threadPool.execute(new Handler(serverSocket.accept()));
+                threadPool.execute(new ValidatorHandler(serverSocket.accept(), validatorAddr));
             }
         } catch (IOException ex) {
             threadPool.shutdown();
@@ -64,9 +67,10 @@ public class ValidatorServer implements Runnable {
     }
 
     public static void main(String[] args) {
-        int port = 8000;
+//        int port = 8000;
+        NetAddress na = new NetAddress("127.0.0.1", 8000);
         try {
-            Thread t = new Thread(new ValidatorServer(port));
+            Thread t = new Thread(new ValidatorServer(na));
             t.start();
         } catch (IOException e) {
             e.printStackTrace();

@@ -6,6 +6,7 @@ import com.pancake.entity.message.PrePrepareMessage;
 import com.pancake.entity.message.PrepareMessage;
 import com.pancake.entity.message.PreparedMessage;
 import com.pancake.entity.util.Const;
+import com.pancake.entity.util.NetAddress;
 import com.pancake.service.component.impl.NetService;
 import com.pancake.util.*;
 import org.slf4j.Logger;
@@ -28,12 +29,11 @@ public class PrepareMessageService {
      * 副本节点（包括主节点）便接受准备消息，并将它们添加到日志中。
      *
      * @param rcvMsg
-     * @param localPort
+     * @param validatorAddr
      * @return
      */
-    public static boolean procPMsg(String rcvMsg, int localPort) throws IOException {
-        String realIp = NetUtil.getRealIp();
-        String url = realIp + ":" + localPort;
+    public static boolean procPMsg(String rcvMsg, NetAddress validatorAddr) throws IOException {
+        String url = validatorAddr.toString();
         logger.info("本机地址为：" + url);
 
         // 1. 校验接收到的 PrepareMessage
@@ -65,15 +65,15 @@ public class PrepareMessageService {
                 logger.info("开始生成 PreparedMessage 并存入数据库");
                 String pdmCollection = url + "." + Const.PDM;
                 PreparedMessage pdm = PreparedMessageService.genInstance(ppm.getClientMsg().getMsgId(), ppm.getViewId(),
-                        ppm.getSeqNum(), NetUtil.getRealIp(), localPort);
+                        ppm.getSeqNum(), validatorAddr.getIp(), validatorAddr.getPort());
                 if (PreparedMessageService.save(pdm, pdmCollection)) {
                     logger.info("PreparedMessage [" + pdm.getMsgId() + "] 已存入数据库");
                     CommitMessage cmtm = CommitMessageService.genCommitMsg(ppm.getSignature(), ppm.getViewId(),
-                            ppm.getSeqNum(), NetUtil.getRealIp(), localPort);
+                            ppm.getSeqNum(), validatorAddr.getIp(), validatorAddr.getPort());
                     logger.info("commit message: " + cmtm.toString());
                     if (CommitMessageService.save(cmtm, cmtmCollection)) {
                         logger.info("CommitMessage [" + cmtm.getMsgId() + "] 已存入数据库");
-                        NetService.broadcastMsg(NetUtil.getRealIp(), localPort, cmtm.toString());
+                        NetService.broadcastMsg(validatorAddr.getIp(), validatorAddr.getPort(), cmtm.toString());
                     } else {
                         logger.info("CommitMessage [" + pdm.getMsgId() + "] 已存在");
                     }

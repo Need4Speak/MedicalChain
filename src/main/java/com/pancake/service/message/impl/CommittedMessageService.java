@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 
-
 /**
  * Created by chao on 2017/11/21.
  */
@@ -37,7 +36,10 @@ public class CommittedMessageService {
     private static class LazyHolder {
         private static final CommittedMessageService INSTANCE = new CommittedMessageService();
     }
-    private CommittedMessageService (){}
+
+    private CommittedMessageService() {
+    }
+
     public static CommittedMessageService getInstance() {
         return LazyHolder.INSTANCE;
     }
@@ -45,14 +47,14 @@ public class CommittedMessageService {
     /**
      * 承认 CommittedMessage 后，将 CommittedMessage 以及其认可的 clientMessage 中的内容（Transaction，Block）
      * 存储到数据库中
+     *
      * @param cmtdMsg
      * @param clientMessage
-     * @param localPort
+     * @param netAddress
      */
     @SuppressWarnings("Duplicates")
-    public void procCMTDM(CommittedMessage cmtdMsg, ClientMessage clientMessage, int localPort) {
-        String realIp = NetUtil.getRealIp();
-        String url = realIp + ":" + localPort;
+    public void procCMTDM(CommittedMessage cmtdMsg, ClientMessage clientMessage, NetAddress netAddress) {
+        String url = netAddress.toString();
         String blockChainCollection = url + "." + Const.BLOCK_CHAIN;
         String txCollection = url + "." + Const.TX;
         String cmtdMsgCollection = url + "." + Const.CMTDM;
@@ -60,7 +62,7 @@ public class CommittedMessageService {
         String cliMsgType = clientMessage.getClass().getSimpleName();
         NetAddress publisherAddr = JsonUtil.getPublisherAddress(Const.BlockChainNodesFile);
         // TODO
-        NetAddress blockerAddr = new NetAddress("127.0.0.1", localPort+1000);
+        NetAddress blockerAddr = new NetAddress("127.0.0.1", netAddress.getPort() + 1000);
 
         if (this.save(cmtdMsg, cmtdMsgCollection)) {
             logger.info("将 CommittedMessage [" + cmtdMsg.toString() + "] 存入数据库");
@@ -72,7 +74,7 @@ public class CommittedMessageService {
                 String blockId = block.getBlockId();
                 if (blockService.save(block, blockChainCollection)) {
                     logger.info("区块 " + blockId + " 存入成功");
-                    if(blockService.updateLastBlockId(blockId , lbiCollection)) {
+                    if (blockService.updateLastBlockId(blockId, lbiCollection)) {
                         logger.info("Last block Id: " + blockId + " 更新成功");
 
                         // 验证成功的 block 发送到 Blocker 服务器上
@@ -95,7 +97,7 @@ public class CommittedMessageService {
                     logger.info("交易 :" + txIdList + " 存入成功");
 
                     // 验证成功的 tx 发送到 TxIdCollector 服务器上
-                    TxIdMessage txIdMsg = timSrv.genInstance(txIdList, realIp, localPort);
+                    TxIdMessage txIdMsg = timSrv.genInstance(txIdList, netAddress.getIp(), netAddress.getPort());
                     netService.sendMsg(txIdMsg.toString(), blockerAddr.getIp(), blockerAddr.getPort());
                 }
             } else {

@@ -1,12 +1,12 @@
 package com.pancake.service.message.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pancake.entity.*;
 import com.pancake.entity.message.ClientMessage;
 import com.pancake.entity.message.CommitMessage;
 import com.pancake.entity.message.CommittedMessage;
 import com.pancake.entity.message.PrePrepareMessage;
 import com.pancake.entity.util.Const;
+import com.pancake.entity.util.NetAddress;
 import com.pancake.service.component.impl.BlockService;
 import com.pancake.service.component.impl.TransactionService;
 import com.pancake.util.*;
@@ -30,13 +30,12 @@ public class CommitMessageService {
     /**
      * 处理接收到的 commit message
      * @param rcvMsg
-     * @param localPort
+     * @param validatorAddr
      * @throws IOException
      */
     @SuppressWarnings("Duplicates")
-    public void procCMTM(String rcvMsg, int localPort) throws IOException {
-        String realIp = NetUtil.getRealIp();
-        String url = realIp + ":" + localPort;
+    public void procCMTM(String rcvMsg, NetAddress validatorAddr) throws IOException {
+        String url = validatorAddr.toString();
         logger.info("本机地址为：" + url);
 
         // 1. 校验接收到的 CommitMessage
@@ -66,9 +65,9 @@ public class CommitMessageService {
                 // 3. 达成 count >= 2 * f 后存入到集合中
                 if (2 * PeerUtil.getFaultCount() <= count) {
                     CommittedMessage cmtdm = cmtdmService.genInstance(ppm.getClientMsg().getMsgId(), ppm.getViewId(),
-                            ppm.getSeqNum(), NetUtil.getRealIp(), localPort);
+                            ppm.getSeqNum(), validatorAddr.getIp(), validatorAddr.getPort());
                     ClientMessage clientMessage = ppm.getClientMsg();
-                    cmtdmService.procCMTDM(cmtdm, clientMessage, localPort);
+                    cmtdmService.procCMTDM(cmtdm, clientMessage, validatorAddr);
                 }
             }
         }

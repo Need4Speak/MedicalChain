@@ -1,6 +1,7 @@
 package com.pancake.handler;
 
 import com.pancake.entity.util.Const;
+import com.pancake.entity.util.NetAddress;
 import com.pancake.service.message.impl.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,21 +11,19 @@ import org.slf4j.LoggerFactory;
  */
 public class PreparedMsgHandler implements Runnable{
     private final static Logger logger = LoggerFactory.getLogger(PreparedMsgHandler.class);
-    private String realIp;
-    private int port;
+    private NetAddress addr;
     private MessageService msgService = new MessageService();
 
-    public PreparedMsgHandler(String realIp, int port) {
-        this.realIp = realIp;
-        this.port = port;
+    public PreparedMsgHandler(NetAddress addr) {
+        this.addr = addr;
     }
 
     public void run() {
 
-        String url = realIp + ":" + port;
+        String url = addr.toString();
         String ppmCollection = url + "." + Const.PPM;
         String pmCollection = url + "." + Const.PM;
         String pdmCollection = url + "." + Const.PDM;
-        msgService.traversePPMAndSaveMsg(ppmCollection, pmCollection, pdmCollection, Const.PDM, realIp, port);
+        msgService.traversePPMAndSaveMsg(ppmCollection, pmCollection, pdmCollection, Const.PDM, addr);
     }
 }

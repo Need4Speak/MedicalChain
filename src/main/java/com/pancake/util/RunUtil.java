@@ -38,7 +38,7 @@ public class RunUtil {
      */
     @Test
     public void countRecordQuantity() {
-        String realIp = NetUtil.getRealIp();
+        String ip = "127.0.0.1";
         String url;
         String ppmCollection;
         String pmCollection;
@@ -50,7 +50,7 @@ public class RunUtil {
 
         // 1. 检索 Validator 上的所有集合
         for (int port = 8000; port < 8004; port++) {
-            url = realIp + ":" + port;
+            url = ip + ":" + port;
             ppmCollection = url + "." + Const.PPM;
             pmCollection = url + "." + Const.PM;
             pdmCollection = url + "." + Const.PDM;
@@ -59,7 +59,7 @@ public class RunUtil {
             blockChainCollection = url + "." + Const.BLOCK_CHAIN;
             txCollection = url + "." + Const.TX;
             String lbiCollection = url + "." + Const.LAST_BLOCK_ID;
-            String txIdCollectorColl = "TxIdCollector" + realIp + ":" + (port + 1000) + ".TxIds";
+            String txIdCollectorColl = "TxIdCollector" + ip + ":" + (port + 1000) + ".TxIds";
 
             long ppmCount = MongoUtil.countRecords(ppmCollection);
             long pmCount = MongoUtil.countRecords(pmCollection);
@@ -131,7 +131,7 @@ public class RunUtil {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_QUEUE);
         List<Transaction> txList = new ArrayList<Transaction>();
         try {
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 100; i++) {
                 Transaction tx = TransactionService.genTx("string" + i, "测试" + i);
 //                if(i<4) {
 //                    txList.add(tx);

@@ -46,12 +46,11 @@ public class BlockMessageService {
     /**
      * 处理客户端发送的消息
      * @param rcvMsg 接收到的消息
-     * @param localPort 本机的端口
+     * @param validatorAddr 本机的url
      * @throws IOException
      */
-    public static void procBlockMsg(String rcvMsg, int localPort) throws Exception {
-        String realIp = NetUtil.getRealIp();
-        String url = realIp + ":" + localPort;
+    public static void procBlockMsg(String rcvMsg, NetAddress validatorAddr) throws Exception {
+        String url = validatorAddr.toString();
         logger.info("本机地址为：" + url);
         // 1. 将从客户端收到的 Block Message 存入到集合中
         String blockMsgCollection = url + "." + Const.BM;
@@ -71,7 +70,7 @@ public class BlockMessageService {
         PrePrepareMessageService.save(ppm, ppmCollection);
 
         // 4. 主节点向其他备份节点广播 PrePrepareMessage
-        NetService.broadcastMsg(NetUtil.getRealIp(), localPort, objectMapper.writeValueAsString(ppm));
+        NetService.broadcastMsg(validatorAddr.getIp(), validatorAddr.getPort(), objectMapper.writeValueAsString(ppm));
     }
 
     /**

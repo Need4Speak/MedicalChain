@@ -33,9 +33,9 @@ public class BlockerServer implements Runnable {
     }
 
     public void run() {
-        String url = NetUtil.getRealIp() + ":" + serverSocket.getLocalPort();
+//        String url = NetUtil.getRealIp() + ":" + serverSocket.getLocalPort();
         try {
-            logger.info("启动 BlockerServer 服务器 " + url);
+            logger.info("启动 BlockerServer 服务器 " + netAddr);
             while (true) {
                 threadPool.execute(new BlockerServerHandler(serverSocket.accept(), netAddr));
             }
