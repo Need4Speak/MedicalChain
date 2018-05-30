@@ -13,10 +13,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created by chao on 2017/11/10.
+ * validators starter，用以启动多个 validator 服务器
  */
-public class ServerFrontEnd {
+public class ValidatorsStarter {
 
-    private final static Logger logger = LoggerFactory.getLogger(ServerFrontEnd.class);
+    private final static Logger logger = LoggerFactory.getLogger(ValidatorsStarter.class);
 
     /**
      * 根据 netAddressList 启动对应端口的 Validator

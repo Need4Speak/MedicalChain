@@ -1,6 +1,7 @@
 package com.pancake.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pancake.entity.pojo.RabbitmqServer;
 import com.pancake.entity.util.Const;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -25,16 +26,17 @@ public class RabbitmqUtil {
     private static ConnectionFactory factory = new ConnectionFactory();
 
     static {
-        String userName = "admin";
-        String password = "admin";
-        String hostName = "127.0.0.1";
-        int portNumber = 5672;
 
-        factory.setUsername(userName);
-        factory.setPassword(password);
+        RabbitmqServer rabbitmqServer = JsonUtil.getRabbitmqServer(Const.BlockChainNodesFile);
+        if(rabbitmqServer != null) {
+            factory.setUsername(rabbitmqServer.getUserName());
+            factory.setPassword(rabbitmqServer.getPassword());
 //        factory.setVirtualHost(virtualHost);
-        factory.setHost(hostName);
-        factory.setPort(portNumber);
+            factory.setHost(rabbitmqServer.getIp());
+            factory.setPort(rabbitmqServer.getPort());
+        } else {
+            logger.error("Rabbitmq 配置信息获取错误");
+        }
     }
 
     public RabbitmqUtil(String queueName) {

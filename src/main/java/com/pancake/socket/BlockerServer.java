@@ -5,16 +5,13 @@ import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import com.pancake.handler.BlockerServerHandler;
 import com.pancake.util.JsonUtil;
-import com.pancake.util.NetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created by chao on 2017/12/25.
@@ -24,7 +21,7 @@ public class BlockerServer implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(BlockerServer.class);
     private final ServerSocket serverSocket;
     private final ExecutorService threadPool;
-    private NetAddress netAddr;
+    private NetAddress netAddr;  // BlockerServer 的网络地址
 
     public BlockerServer(NetAddress netAddr) throws IOException {
         this.netAddr = netAddr;
@@ -33,7 +30,6 @@ public class BlockerServer implements Runnable {
     }
 
     public void run() {
-//        String url = NetUtil.getRealIp() + ":" + serverSocket.getLocalPort();
         try {
             logger.info("启动 BlockerServer 服务器 " + netAddr);
             while (true) {
@@ -46,29 +42,25 @@ public class BlockerServer implements Runnable {
     }
 
     /**
-     * 根据 netAddressList 启动对应端口的 TxIdCollector
-     *
-     * @param netAddressList TxIdCollectorAddress 对象 list
+     * 同时启动 Blocker 与 BlockerServer服务器
+     * @param netAddr
      */
-    public static void startBlockerServers(List<NetAddress> netAddressList) {
-        ThreadPoolExecutor es = (ThreadPoolExecutor) Executors.
-                newCachedThreadPool();
-        for (NetAddress tic : netAddressList) {
-            try {
-                logger.info("开始启动端口为[" + tic.getPort() + "]的 Blocker Server");
-                es.execute(new BlockerServer(tic));
-                es.execute(new Blocker(tic));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    public static void start(NetAddress netAddr) {
+        try {
+            Thread tBlockerServer = new Thread(new BlockerServer(netAddr));
+            Thread tBlocker = new Thread(new Blocker(netAddr));
+            // 1. 启动 BlockerServer，用于接收来自 Validator 的消息
+            tBlockerServer.start();
+            // 2. 启动 Blocker，用于从 RabbitMQ 中获取 Transaction Id，打包成区块，发送到 Validator 主节点上
+            tBlocker.start();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-//        logger.info("验证节点终止运行");
     }
-
     public static void main(String[] args) {
-        List<NetAddress> blockerList = JsonUtil.getBlockerAddressList(Const.BlockChainNodesFile);
-        logger.info("Blocker 地址 list 为：" + blockerList);
-        startBlockerServers(blockerList);
+        NetAddress netAddr = JsonUtil.getCurrentBlocker(Const.BlockChainNodesFile);
+        start(netAddr);
+
     }
 }

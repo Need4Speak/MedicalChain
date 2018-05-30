@@ -17,4 +17,4 @@
 用于开发 validator node.
 1. mongodb 3.2
 2. RabbitMQ 3.7.4
-3. 启动顺序：Transaction Transmitter - Server Front End - Blocker Server
+3. 多及节点测试启动顺序：Transaction Transmitter - ValidatorsStarter - BlockersStarter

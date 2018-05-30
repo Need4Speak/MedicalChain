@@ -34,7 +34,7 @@ public class Blocker implements Runnable {
     private double blockSize;
     private int timeout; // Blocker 连接 Validator 的超时时间
 
-    private NetAddress blockerAddr;
+    private NetAddress netAddr; // Blocker 的网络地址
 
     public Blocker() {
         this.timeInterval = 5000;
@@ -42,28 +42,28 @@ public class Blocker implements Runnable {
         this.timeout = 5000;
     }
 
-    public Blocker(NetAddress blockerAddr) {
+    public Blocker(NetAddress netAddr) {
         this.timeInterval = 5000;
         this.blockSize = Const.TX_ID_LIST_SIZE;
         this.timeout = 5000;
-        this.blockerAddr = blockerAddr;
+        this.netAddr = netAddr;
     }
 
     public void run() {
-        logger.info("Blocker [" + blockerAddr + "] 启动");
+        logger.info("Blocker [" + netAddr + "] 启动");
         String lastBlockId;
         Block block;
         long blockLength;
 
-        String blockChainCollection = blockerAddr + "." + Const.BLOCK_CHAIN;
-        String lbiCollection = blockerAddr + "." + Const.LAST_BLOCK_ID;
-        String txIdCollection = blockerAddr + "." + Const.TX_ID;
+        String blockChainCollection = netAddr + "." + Const.BLOCK_CHAIN;
+        String lbiCollection = netAddr + "." + Const.LAST_BLOCK_ID;
+        String txIdCollection = netAddr + "." + Const.TX_ID;
 
         while (true) {
             blockLength = MongoUtil.countRecords(blockChainCollection);
             if (blockLength > 0) {
-                if (blockerService.isCurrentBlocker(blockerAddr, blockLength)) {
-                    logger.info("Blocker [" + blockerAddr + "] 开始生成区块，当前区块链长度为" + blockLength);
+                if (blockerService.isCurrentBlocker(netAddr, blockLength)) {
+                    logger.info("Blocker [" + netAddr + "] 开始生成区块，当前区块链长度为" + blockLength);
                     lastBlockId = blockService.getLastBlockId(lbiCollection);
                     block = blockService.genBlock(lastBlockId, txIdCollection, this.blockSize);
                     if (block != null) {

@@ -36,7 +36,7 @@ public class Main {
     public static void startServerFrontEnd() {
         List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainNodesFile);
         logger.info("Validator 地址 list 为：" + list);
-        ServerFrontEnd.startValidators(list);
+        ValidatorsStarter.startValidators(list);
     }
 
     public static void startTransactionTransmitter() {

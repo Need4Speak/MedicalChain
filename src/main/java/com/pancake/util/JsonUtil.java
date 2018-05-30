@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pancake.entity.pojo.RabbitmqServer;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import org.slf4j.Logger;
@@ -113,6 +114,43 @@ public class JsonUtil {
             addrList.add(new NetAddress((String)tmpMap.get("ip"), (Integer) tmpMap.get("port")));
         }
         return addrList;
+    }
+
+    /**
+     * 获取当前 Validator 的地址
+     * @param jsonFile
+     * @return
+     */
+    public static NetAddress getCurrentValidator(String jsonFile) {
+        String jsonStr = getStrByJsonFile(jsonFile);
+        Map map = jsonToMap(jsonStr);
+        Map pubMap = (HashMap) map.get("current_validator");
+        return new NetAddress((String)pubMap.get("ip"), (Integer) pubMap.get("port"));
+    }
+
+    /**
+     * 获取当前 Blocker 的地址
+     * @param jsonFile
+     * @return
+     */
+    public static NetAddress getCurrentBlocker(String jsonFile) {
+        String jsonStr = getStrByJsonFile(jsonFile);
+        Map map = jsonToMap(jsonStr);
+        Map pubMap = (HashMap) map.get("current_blocker");
+        return new NetAddress((String)pubMap.get("ip"), (Integer) pubMap.get("port"));
+    }
+
+    /**
+     * 从 jsonFile 中获取 Rabbitmq 的配置信息
+     * @param jsonFile
+     * @return
+     */
+    public static RabbitmqServer getRabbitmqServer(String jsonFile) {
+        String jsonStr = getStrByJsonFile(jsonFile);
+        Map map = jsonToMap(jsonStr);
+        Map pubMap = (HashMap) map.get("rabbitmq");
+        return new RabbitmqServer((String)pubMap.get("userName"), (String)pubMap.get("password"), (String)pubMap.get("ip"),
+                (Integer) pubMap.get("port"));
     }
 
     /**

@@ -1,9 +1,11 @@
 package com.pancake.socket;
 
+import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import com.pancake.handler.CommittedMsgHandler;
 import com.pancake.handler.ValidatorHandler;
 import com.pancake.handler.PreparedMsgHandler;
+import com.pancake.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,14 +22,12 @@ public class ValidatorServer implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(ValidatorServer.class);
     private final ServerSocket serverSocket;
     private final ExecutorService threadPool;
-    private final ExecutorService pdmhPool;
     private NetAddress validatorAddr;
 
     public ValidatorServer(NetAddress validatorAddr) throws IOException {
         this.validatorAddr = validatorAddr;
         serverSocket = new ServerSocket(validatorAddr.getPort());
         threadPool = Executors.newCachedThreadPool();
-        pdmhPool = Executors.newCachedThreadPool();
 //        serverSocket.setSoTimeout(100000);
     }
 
@@ -41,7 +41,6 @@ public class ValidatorServer implements Runnable {
     public ValidatorServer(int port, int poolSize) throws IOException {
         serverSocket = new ServerSocket(port);
         threadPool = Executors.newFixedThreadPool(poolSize);
-        pdmhPool = Executors.newFixedThreadPool(poolSize);
 //        serverSocket.setSoTimeout(100000);
     }
 
@@ -67,10 +66,10 @@ public class ValidatorServer implements Runnable {
     }
 
     public static void main(String[] args) {
-//        int port = 8000;
-        NetAddress na = new NetAddress("127.0.0.1", 8000);
+        // 单独启动一个 Validator 服务器
+        NetAddress validatorAddr = JsonUtil.getCurrentValidator(Const.BlockChainNodesFile);
         try {
-            Thread t = new Thread(new ValidatorServer(na));
+            Thread t = new Thread(new ValidatorServer(validatorAddr));
             t.start();
         } catch (IOException e) {
             e.printStackTrace();
